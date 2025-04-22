@@ -53,20 +53,7 @@ export default function AttendancePage() {
               <option value="2027">2027</option>
             </select>
           </div>
-
-          {/* Index Number Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Index Number</label>
-            <input
-              type="text"
-              value={indexNumber}
-              onChange={(e) => setIndexNumber(e.target.value)}
-              placeholder="e.g., 2000"
-              required
-              className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
-            />
-          </div>
-
+          
           {/* Subject Selector */}
           <div>
             <label className="block text-sm font-medium text-gray-700">Select Subject</label>
@@ -81,6 +68,21 @@ export default function AttendancePage() {
               <option value="Physics">Physics</option>
             </select>
           </div>
+
+          {/* Index Number Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Index Number</label>
+            <input
+              type="text"
+              value={indexNumber}
+              onChange={(e) => setIndexNumber(e.target.value)}
+              placeholder="e.g., 2000"
+              required
+              className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
+            />
+          </div>
+
+          
 
           {/* Submit Button */}
           <div className="flex justify-center">
