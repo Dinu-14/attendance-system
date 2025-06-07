@@ -19,7 +19,7 @@ export default function LoginPage() {
     })
 
     if (res.ok) {
-      router.push('/dashboard')
+      router.push('/Dashboard')
     } else {
       alert('Invalid username or password')
     }

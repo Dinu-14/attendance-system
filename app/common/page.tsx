@@ -8,6 +8,7 @@ export default function CommonMessagePage() {
   const [batch, setBatch] = useState('')
   const [message, setMessage] = useState('')
   const [showOverlay, setShowOverlay] = useState(false)
+  const [subject, setSubject] = useState('')
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -53,6 +54,22 @@ export default function CommonMessagePage() {
                 <option value="2027">2027</option>
               </select>
             </div>
+
+             {/* Subject Selector */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Select Subject</label>
+            <select
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
+            >
+              <option value="">-- Select Subject --</option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="Physics">Physics</option>
+            </select>
+          </div>
+
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Message</label>
