@@ -1,65 +1,100 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
+import * as api from '../lib/api';
+import toast from 'react-hot-toast';
+import Image from 'next/image'; // Make sure to import the Image component
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { setToken, token: authToken } = useAuth();
+  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // Call backend API to validate credentials
-    const res = await fetch('http://localhost:8080/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
-
-    if (res.ok) {
-      router.push('/Dashboard')
-    } else {
-      alert('Invalid username or password')
+  // If user is already logged in, redirect to dashboard
+  useEffect(() => {
+    if (authToken) {
+      router.replace('/dashboard');
     }
-  }
+  }, [authToken, router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username || !password) {
+        toast.error("Please enter both username and password.");
+        return;
+    }
+    setIsLoading(true);
+    const toastId = toast.loading('Logging in...');
+
+    try {
+      const response = await api.login(username, password);
+      setToken(response.token);
+      toast.dismiss(toastId);
+      toast.success('Login successful!');
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast.dismiss(toastId);
+      toast.error(`Login failed: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 space-y-6">
-        <div className="flex justify-center">
-          <img src="/logo.png" alt="Logo" className="h-50" />
-        </div>
+    // Main container for the full-screen black background and centering
+    <main className="flex min-h-screen items-center justify-center bg-black p-4">
+      
+      {/* The floating white card */}
+      <div className="w-60 max-w-sm rounded-2xl bg-white p-8 shadow-2xl space-y-8">
         
+        {/* Logo */}
+        <div className="flex justify-center">
+            <Image 
+                src="/logo.png" 
+                alt="Universal Science Academy Logo"
+                width={150}
+                height={150}
+                priority // Helps load the logo faster
+            />
+        </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            required
-          />
-            <div className="flex justify-center">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white py-2 w-20 rounded hover:bg-blue-700"
-            >
-              Login
-            </button>
-            </div>
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="w-full space-y-6">
+          <div>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full px-4 py-3 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Authenticating...' : 'Login'}
+          </button>
         </form>
       </div>
-    </div>
-  )
+    </main>
+  );
 }
