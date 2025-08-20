@@ -51,10 +51,16 @@ interface StudentData {
     batchId: number;
     subjectIds: number[];
 }
-export const getStudents = (batchId: number, subjectId: number, token: string) =>
-    fetch(`${API_BASE_URL}/api/admin/students?batchId=${batchId}&subjectId=${subjectId}`, {
+export const getStudents = (batchId?: number, subjectId?: number, token?: string) => {
+    const params = new URLSearchParams();
+    if (batchId) params.append('batchId', batchId.toString());
+    if (subjectId) params.append('subjectId', subjectId.toString());
+    
+    const url = `${API_BASE_URL}/api/admin/students${params.toString() ? `?${params.toString()}` : ''}`;
+    return fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
     }).then(handleResponse);
+};
 
 export const addStudent = (studentData: StudentData, token: string) =>
     fetch(`${API_BASE_URL}/api/admin/students`, {
@@ -97,5 +103,11 @@ export const markAttendance = (studentId: string, subjectId: number) =>
 // === ADMIN - ATTENDANCE REPORTS ===
 export const getAttendanceReport = (subjectId: number, date: string, token: string) => 
     fetch(`${API_BASE_URL}/api/attendance/report?subjectId=${subjectId}&date=${date}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    }).then(handleResponse);
+
+// === ADMIN - DASHBOARD STATS ===
+export const getDashboardStats = (token: string) =>
+    fetch(`${API_BASE_URL}/api/admin/stats`, {
         headers: { 'Authorization': `Bearer ${token}` }
     }).then(handleResponse);

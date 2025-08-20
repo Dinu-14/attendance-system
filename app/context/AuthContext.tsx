@@ -19,13 +19,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const validateToken = async (token: string) => {
+      // Replace with your actual API endpoint and logic
+      try {
+        const res = await fetch('/api/auth/validate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          setTokenState(token);
+        } else {
+          setTokenState(null);
+          localStorage.removeItem("authToken");
+        }
+      } catch (error) {
+        setTokenState(null);
+        localStorage.removeItem("authToken");
+      }
+    };
+
     try {
       const storedToken = localStorage.getItem("authToken");
       if (storedToken) {
-        setTokenState(storedToken);
+        validateToken(storedToken);
+      } else {
+        setTokenState(null);
       }
     } catch (error) {
       console.error("Could not access localStorage", error);
+      setTokenState(null);
     } finally {
       setIsLoading(false);
     }
