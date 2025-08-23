@@ -11,17 +11,17 @@ import { Eye, EyeOff } from 'lucide-react';
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const { setToken, token: authToken } = useAuth();
+  const { setToken, token: authToken, isLoading } = useAuth();
   const router = useRouter();
 
-  // If user is already logged in, redirect to dashboard
+  // Only redirect after token is validated and loading is complete
   useEffect(() => {
-    if (authToken) {
+    if (!isLoading && authToken) {
       router.replace('/dashboard');
     }
-  }, [authToken, router]);
+  }, [authToken, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +29,8 @@ export default function LoginPage() {
         toast.error("Please enter both username and password.");
         return;
     }
-    setIsLoading(true);
-    const toastId = toast.loading('Logging in...');
+  setIsSubmitting(true);
+  const toastId = toast.loading('Logging in...');
 
     try {
       const response = await api.login(username, password);
@@ -42,7 +42,7 @@ export default function LoginPage() {
       toast.dismiss(toastId);
       toast.error(`Login failed: ${error.message}`);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -130,16 +130,16 @@ export default function LoginPage() {
             <div className="mt-12">
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isSubmitting}
                 className="w-3/4 mx-auto block relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
               >
-                {isLoading && (
+                {isSubmitting && (
                   <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   </div>
                 )}
-                <span className={isLoading ? 'opacity-0' : 'opacity-100'}>
-                  {isLoading ? 'Authenticating...' : 'Sign In'}
+                <span className={isSubmitting ? 'opacity-0' : 'opacity-100'}>
+                  {isSubmitting ? 'Authenticating...' : 'Sign In'}
                 </span>
               </button>
             </div>

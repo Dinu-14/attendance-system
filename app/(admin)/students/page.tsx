@@ -182,51 +182,50 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-green-100 p-6">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                        <Users className="text-blue-600" />
-                        Student Management
-                    </h1>
-                    <p className="text-gray-600">Add, view, and manage students in your institute</p>
-                </div>
+                <div className="mb-10 flex items-center gap-4">
+                    <div className="bg-white/70 backdrop-blur-md rounded-full p-3 shadow-lg">
+                        <Users className="text-blue-600 animate-bounce" size={36} />
+                    </div>
+                    <h1 className="text-5xl font-bold text-gray-900 tracking-tight drop-shadow-sm">Student Management</h1>
+                </div><br></br>
 
                 {/* Tab Navigation */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-                    <div className="flex border-b border-gray-200">
+                <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-blue-100 mb-8">
+                    <div className="flex border-b border-blue-100 gap-4">
                         <button
                             onClick={() => setActiveTab('view')}
-                            className={`px-6 py-4 font-medium text-sm flex items-center gap-5 ${
+                            className={`px-8 py-5 font-bold text-base flex items-center gap-4 transition-all duration-200 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-md ${
                                 activeTab === 'view'
-                                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                    ? 'text-blue-800 border-b-4 border-blue-600 bg-blue-100 shadow-lg scale-105'
+                                    : 'text-gray-500 bg-white/70 hover:text-blue-700 hover:bg-blue-50 hover:scale-105'
                             }`}
                         >
-                            <Search size={18} />
+                            <Search size={22} className={activeTab === 'view' ? 'animate-pulse' : ''} />
                             View Students
                         </button>
                         <button
                             onClick={() => setActiveTab('add')}
-                            className={`px-6 py-4 font-medium text-sm flex items-center gap-5 ${
+                            className={`px-8 py-5 font-bold text-base flex items-center gap-4 transition-all duration-200 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md ${
                                 activeTab === 'add'
-                                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                    ? 'text-green-800 border-b-4 border-green-600 bg-green-100 shadow-lg scale-105'
+                                    : 'text-gray-500 bg-white/70 hover:text-green-700 hover:bg-green-50 hover:scale-105'
                             }`}
                         >
-                            <UserPlus size={18} />
+                            <UserPlus size={22} className={activeTab === 'add' ? 'animate-pulse' : ''} />
                             Add Student
                         </button>
                         <button
                             onClick={() => setActiveTab('import')}
-                            className={`px-6 py-4 font-medium text-sm flex items-center gap-5 ${
+                            className={`px-8 py-5 font-bold text-base flex items-center gap-4 transition-all duration-200 rounded-t-xl focus:outline-none focus:ring-2 focus:ring-purple-400 shadow-md ${
                                 activeTab === 'import'
-                                    ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                    ? 'text-purple-800 border-b-4 border-purple-600 bg-purple-100 shadow-lg scale-105'
+                                    : 'text-gray-500 bg-white/70 hover:text-purple-700 hover:bg-purple-50 hover:scale-105'
                             }`}
                         >
-                            <Upload size={18} />
+                            <Upload size={22} className={activeTab === 'import' ? 'animate-pulse' : ''} />
                             Import CSV
                         </button>
                     </div>
@@ -237,7 +236,7 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
                     <div className="space-y-6">
                         {/* Filter Section */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-4">
                                 <Search className="text-blue-600" size={20} />
                                 Filter Students
                             </h2>
@@ -387,79 +386,64 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
                 )}
 
                 {activeTab === 'add' && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                            <UserPlus className="text-blue-600" size={20} />
+                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-blue-100 p-10">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-4">
+                            <UserPlus className="text-blue-600 animate-bounce" size={28} />
                             Add New Student
                         </h2>
-                        
-                        <form onSubmit={handleAddStudent} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <form onSubmit={handleAddStudent} className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Student ID *
-                                    </label>
+                                    <label className="block text-base font-semibold text-gray-700 mb-2">Student ID *</label>
                                     <input
                                         type="text"
                                         required
                                         value={newStudent.studentId}
                                         onChange={(e) => setNewStudent({...newStudent, studentId: e.target.value})}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full px-5 py-4 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-lg shadow-sm bg-white/80"
                                         placeholder="e.g., ST001"
                                     />
                                 </div>
-                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Full Name *
-                                    </label>
+                                    <label className="block text-base font-semibold text-gray-700 mb-2">Full Name *</label>
                                     <input
                                         type="text"
                                         required
                                         value={newStudent.fullName}
                                         onChange={(e) => setNewStudent({...newStudent, fullName: e.target.value})}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full px-5 py-4 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-lg shadow-sm bg-white/80"
                                         placeholder="Enter full name"
                                     />
                                 </div>
-                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Student Phone Number *
-                                    </label>
+                                    <label className="block text-base font-semibold text-gray-700 mb-2">Student Phone Number *</label>
                                     <input
                                         type="tel"
                                         required
                                         value={newStudent.studentPhoneNumber}
                                         onChange={(e) => setNewStudent({...newStudent, studentPhoneNumber: e.target.value})}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full px-5 py-4 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-lg shadow-sm bg-white/80"
                                         placeholder="1234567890"
                                     />
                                 </div>
-                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Parent Phone Number *
-                                    </label>
+                                    <label className="block text-base font-semibold text-gray-700 mb-2">Parent Phone Number *</label>
                                     <input
                                         type="tel"
                                         required
                                         value={newStudent.parentPhoneNumber}
                                         onChange={(e) => setNewStudent({...newStudent, parentPhoneNumber: e.target.value})}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full px-5 py-4 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-lg shadow-sm bg-white/80"
                                         placeholder="0987654321"
                                     />
                                 </div>
-                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Batch *
-                                    </label>
+                                    <label className="block text-base font-semibold text-gray-700 mb-2">Batch *</label>
                                     <select
                                         required
                                         value={newStudent.batchId}
                                         onChange={(e) => setNewStudent({...newStudent, batchId: e.target.value})}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                        className="w-full px-5 py-4 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-lg shadow-sm bg-white/80"
                                     >
                                         <option value="">Select Batch</option>
                                         {batches.map(batch => (
@@ -467,11 +451,8 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
                                         ))}
                                     </select>
                                 </div>
-                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Subjects *
-                                    </label>
+                                    <label className="block text-base font-semibold text-gray-700 mb-2">Subjects *</label>
                                     <div className="space-y-2">
                                         {subjects.map(subject => (
                                             <label key={subject.id} className="flex items-center space-x-3">
@@ -479,16 +460,15 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
                                                     type="checkbox"
                                                     checked={newStudent.subjectIds.includes(subject.id)}
                                                     onChange={() => handleSubjectToggle(subject.id)}
-                                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                                    className="h-5 w-5 text-blue-600 focus:ring-blue-400 border-blue-200 rounded shadow-sm"
                                                 />
-                                                <span className="text-sm text-gray-700">{subject.name}</span>
+                                                <span className="text-base text-gray-700">{subject.name}</span>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                            <div className="flex justify-end space-x-6 pt-8 border-t border-blue-100">
                                 <button
                                     type="button"
                                     onClick={() => setNewStudent({
@@ -499,15 +479,15 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
                                         batchId: '',
                                         subjectIds: []
                                     })}
-                                    className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                                    className="px-8 py-4 border border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-100 transition-all text-lg shadow"
                                 >
                                     Reset Form
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                                    className="px-8 py-4 bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold rounded-xl hover:from-blue-600 hover:to-green-600 transition-all flex items-center gap-3 text-lg shadow-lg"
                                 >
-                                    <UserPlus size={18} />
+                                    <UserPlus size={22} />
                                     Add Student
                                 </button>
                             </div>
@@ -516,57 +496,55 @@ ST003,Bob Wilson,1234567892,0987654323,2,"2"`;
                 )}
 
                 {activeTab === 'import' && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                            <Upload className="text-blue-600" size={20} />
+                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-blue-100 p-10">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-4">
+                            <Upload className="text-blue-600 animate-bounce" size={28} />
                             Import Students from CSV
                         </h2><br></br>
-                        
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             {/* Instructions */}
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <h3 className="text-sm font-medium text-blue-900 mb-2">CSV Format Instructions</h3>
-                                <p className="text-sm text-blue-700 mb-3">
+                            <div className="bg-blue-50/80 border border-blue-200 rounded-xl p-6 shadow">
+                                <h3 className="text-lg font-bold text-blue-900 mb-2">CSV Format Instructions</h3>
+                                <p className="text-base text-blue-700 mb-3">
                                     Your CSV file must contain the following columns in this exact order:
                                 </p>
-                                <div className="text-xs font-mono bg-white border border-blue-200 rounded p-2 text-blue-800">
+                                <div className="text-sm font-mono bg-white border border-blue-200 rounded p-3 text-blue-800">
                                     studentId, fullName, studentPhoneNumber, parentPhoneNumber, batchId, subjectIds
                                 </div>
-                                <p className="text-xs text-blue-600 mt-2">
-                                    Note: subjectIds should be comma-separated numbers in quotes, e.g., "1,2"
+                                <p className="text-sm text-blue-600 mt-2">
+                                    <span className="font-semibold">Note:</span> subjectIds should be comma-separated numbers in quotes, e.g., "1,2"
                                 </p>
                             </div><br></br>
 
-                            
                             {/* File Upload */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-base font-semibold text-gray-700 mb-3">
                                     Select CSV File
                                 </label>
-                                <div className="relative">
+                                <div className="relative flex items-center gap-4">
                                     <input
                                         type="file"
                                         accept=".csv"
                                         onChange={handleFileChange}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        className="flex-1 px-5 py-4 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors text-lg shadow-sm bg-white/80 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-base file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                     />
-                                </div><br></br>
-                                {file && (
-                                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
-                                        <FileText size={16} />
-                                        Selected: {file.name}
-                                    </div>
-                                )}
-                            </div><br></br>
+                                    {file && (
+                                        <div className="flex items-center gap-2 text-base text-gray-700 bg-blue-50 rounded-lg px-4 py-2 shadow">
+                                            <FileText size={18} />
+                                            <span className="font-medium">{file.name}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
                             {/* Import Button */}
                             <div className="flex justify-end">
                                 <button
                                     onClick={handleImport}
                                     disabled={!file}
-                                    className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                                >
-                                    <Upload size={18} />
+                                    className="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold rounded-xl hover:from-green-600 hover:to-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all flex items-center gap-3 text-lg shadow-lg"
+                                ><br></br>
+                                    <Upload size={22} />
                                     Import Students
                                 </button>
                             </div>

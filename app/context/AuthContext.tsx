@@ -22,13 +22,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const validateToken = async (token: string) => {
       // Replace with your actual API endpoint and logic
       try {
-        const res = await fetch('/api/auth/validate', {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+        console.log('[AuthContext] Validating token:', token);
+        const res = await fetch(`${API_BASE_URL}/api/auth/validate`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
         });
+        console.log('[AuthContext] Validation response status:', res.status);
         if (res.ok) {
           setTokenState(token);
         } else {
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           localStorage.removeItem("authToken");
         }
       } catch (error) {
+        console.error('[AuthContext] Error during token validation:', error);
         setTokenState(null);
         localStorage.removeItem("authToken");
       }
@@ -43,13 +47,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       const storedToken = localStorage.getItem("authToken");
+      console.log('[AuthContext] Loaded token from localStorage:', storedToken);
       if (storedToken) {
         validateToken(storedToken);
       } else {
         setTokenState(null);
       }
     } catch (error) {
-      console.error("Could not access localStorage", error);
+      console.error("[AuthContext] Could not access localStorage", error);
       setTokenState(null);
     } finally {
       setIsLoading(false);

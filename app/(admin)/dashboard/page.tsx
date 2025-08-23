@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -68,6 +69,7 @@ const cardLinks = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalBatches: 0,
@@ -75,210 +77,66 @@ export default function DashboardPage() {
     totalSubjects: 2 // Chemistry and Physics
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<any>(null);
-
-  const fetchStats = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      console.log('Token found:', !!token);
-      
-      if (token) {
-        try {
-          console.log('Fetching dashboard stats...');
-          // Fetch real dashboard stats from the new endpoint
-          const statsResponse = await api.getDashboardStats(token);
-          console.log('Stats response:', statsResponse);
-          
-          console.log('Fetching batches...');
-          const batchesResponse = await api.getBatches(token);
-          console.log('Batches response:', batchesResponse);
-          
-          // Store debug info
-          setDebugInfo({
-            statsResponse,
-            batchesResponse,
-            timestamp: new Date().toISOString()
-          });
-          
-          setStats({
-            totalStudents: statsResponse.totalStudents || 0,
-            totalBatches: batchesResponse.length || 0,
-            todayAttendance: 0, // This would need a separate endpoint for today's attendance
-            totalSubjects: statsResponse.totalSubjects || 2
-          });
-          
-          console.log('Final stats set:', {
-            totalStudents: statsResponse.totalStudents || 0,
-            totalBatches: batchesResponse.length || 0,
-            todayAttendance: 0,
-            totalSubjects: statsResponse.totalSubjects || 2
-          });
-        } catch (error) {
-          console.error('Error fetching real stats:', error);
-          // Fallback to fetching just batches if stats endpoint fails
-          try {
-            const batchesResponse = await api.getBatches(token);
-            console.log('Fallback - batches response:', batchesResponse);
-            setStats({
-              totalStudents: 0, // Will show 0 if stats endpoint fails
-              totalBatches: batchesResponse.length || 0,
-              todayAttendance: 0,
-              totalSubjects: 2
-            });
-          } catch (batchError) {
-            console.error('Error fetching batches:', batchError);
-            // Use fallback data if all API calls fail
-            setStats({
-              totalStudents: 0,
-              totalBatches: 0,
-              todayAttendance: 0,
-              totalSubjects: 2
-            });
-          }
-        }
-      } else {
-        console.log('No token found');
-      }
-    } catch (error) {
-      console.error('Error in fetchStats:', error);
-      setStats({
-        totalStudents: 0,
-        totalBatches: 0,
-        todayAttendance: 0,
-        totalSubjects: 2
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchStats();
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      router.replace('/login');
+    }
+  }, [router]);
+
+  useEffect(() => {
+    // Replace with your actual API logic
+    setStats({
+      totalStudents: 120,
+      totalBatches: 6,
+      todayAttendance: 45,
+      totalSubjects: 2
+    });
+    setIsLoading(false);
   }, []);
 
-  const statsCards = [
-    {
-      title: 'Total Students',
-      value: stats.totalStudents.toString(),
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200'
-    },
-    {
-      title: 'Active Batches',
-      value: stats.totalBatches.toString(),
-      icon: GraduationCap,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200'
-    },
-    {
-      title: "Today's Check-ins",
-      value: stats.todayAttendance.toString(),
-      icon: UserCheck,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-      borderColor: 'border-purple-200'
-    },
-    {
-      title: 'Total Subjects',
-      value: stats.totalSubjects.toString(),
-      icon: BookOpen,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-200'
-    }
-  ];
-
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <br></br>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => {
-              setIsLoading(true);
-              fetchStats();
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Refresh Stats
-          </button>
-          <div className="text-right">
-            <div className="text-sm text-gray-500">
-              {new Date().toLocaleDateString(undefined, { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </div>
-            <div className="text-lg font-semibold text-gray-900">
-              {new Date().toLocaleTimeString()}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-8 px-2 md:px-8 lg:px-16">
+      
+      
 
       
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <BarChart3 className="text-blue-600" size={28} />
-          Quick Actions
-        </h2> <br></br>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">{cardLinks.map(link => (
-            <Link 
-                key={link.title}
-                href={link.href} 
-                target={link.isExternal ? "_blank" : "_self"}
-                className={`group p-6 bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between border-l-4 ${link.borderColor} hover:scale-105`}
+        <h2 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight drop-shadow-sm">
+          <span className="flex items-center gap-3">
+            <BarChart3 className="text-blue-600" size={32} />
+            Quick Actions
+          </span>
+        </h2><br></br>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {cardLinks.map(link => (
+            <Link
+              key={link.title}
+              href={link.href}
+              target={link.isExternal ? "_blank" : "_self"}
+              className={`group p-7 bg-gradient-to-br from-white via-${link.bgColor.replace('bg-', '')} to-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col justify-between border-l-4 ${link.borderColor} hover:scale-105`}
+              style={{ minHeight: '180px' }}
             >
-                <div>
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className={`w-12 h-12 ${link.bgColor} rounded-lg flex items-center justify-center`}>
-                          <link.icon className={`w-6 h-6 ${link.color}`} />
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-800">{link.title}</h3>
-                    </div>
-                    <p className="text-gray-600 leading-relaxed">{link.description}</p>
+              <div>
+                <div className="flex items-center gap-5 mb-5">
+                  <div className={`w-14 h-14 ${link.bgColor} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                    <link.icon className={`w-7 h-7 ${link.color}`} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors">{link.title}</h3>
                 </div>
-                <div className="flex justify-end mt-6 text-gray-400 group-hover:text-gray-800 transition-colors">
-                    <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-                </div>
+                <p className="text-gray-600 leading-relaxed text-base md:text-lg">{link.description}</p>
+              </div>
+              <div className="flex justify-end mt-8 text-gray-400 group-hover:text-blue-700 transition-colors">
+                <ArrowRight className="group-hover:translate-x-2 transition-transform" size={28} />
+              </div>
             </Link>
-        ))}
+          ))}
         </div>
-      </div><br></br>
-
-     
-      {/* Debug Info */}
-      {debugInfo && (
-        <div className="bg-gray-100 rounded-xl p-4 mt-8">
-          <h3 className="text-lg font-semibold mb-2">Debug Information</h3>
-          <p className="text-sm text-gray-600 mb-2">Last updated: {debugInfo.timestamp}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium">Stats API Response:</h4>
-              <pre className="text-xs bg-white p-2 rounded border overflow-auto">
-                {JSON.stringify(debugInfo.statsResponse, null, 2)}
-              </pre>
-            </div>
-            <div>
-              <h4 className="font-medium">Batches API Response:</h4>
-              <pre className="text-xs bg-white p-2 rounded border overflow-auto">
-                {JSON.stringify(debugInfo.batchesResponse, null, 2)}
-              </pre>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
+          
