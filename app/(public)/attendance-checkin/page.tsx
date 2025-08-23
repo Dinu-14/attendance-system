@@ -22,15 +22,20 @@ const DUMMY_TOKEN = 'dummy-for-public-page';
 
 export default function AttendanceCheckinPage() {
     const [subjects, setSubjects] = useState<any[]>([]);
+    const [batches, setBatches] = useState<any[]>([]);
+    const [selectedBatch, setSelectedBatch] = useState('');
     const [selectedSubject, setSelectedSubject] = useState('');
     const [isSessionSet, setIsSessionSet] = useState(false);
     const [studentId, setStudentId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [recentCheckIns, setRecentCheckIns] = useState<any[]>([]);
-    const [currentTime, setCurrentTime] = useState(new Date());
+    const [currentTime, setCurrentTime] = useState<Date | null>(null);
+    const [mounted, setMounted] = useState(false);
 
-    // Update time every second
+    // Only start updating time after component is mounted on client
     useEffect(() => {
+        setMounted(true);
+        setCurrentTime(new Date());
         const timer = setInterval(() => {
             setCurrentTime(new Date());
         }, 1000);
@@ -38,28 +43,49 @@ export default function AttendanceCheckinPage() {
     }, []);
 
     useEffect(() => {
-        const fetchSubjects = async () => {
+        const fetchBatchesAndSubjects = async () => {
             try {
-                // In a real app, this endpoint might need to be public or use a different auth method
-                // For now, we simulate an admin setting it up. A better approach might be a dedicated endpoint
-                // that doesn't require a user-specific token.
-                // This is a temporary solution to make it work.
-                const allSubjects = await api.getSubjects(DUMMY_TOKEN); // This will likely fail with 401. We will use dummy data.
+                // Fetch batches first
+                const allBatches = await fetch('http://localhost:8080/api/attendance/public/batches')
+                    .then(async (response) => {
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({ message: 'Failed to fetch batches' }));
+                            throw new Error(errorData.message || 'Failed to fetch batches');
+                        }
+                        return response.json();
+                    });
+                setBatches(allBatches);
+            } catch (error: any) {
+                console.error('Could not fetch batches:', error.message);
+                toast.error(`Failed to load batches: ${error.message}`);
+                setBatches([]);
+            }
+
+            // Fetch subjects
+            try {
+                const response = await fetch('http://localhost:8080/api/attendance/public/subjects');
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: 'Failed to fetch subjects' }));
+                    throw new Error(errorData.message || 'Failed to fetch subjects');
+                }
+                const allSubjects = await response.json();
                 setSubjects(allSubjects);
-            } catch (error) {
-                console.error("Could not fetch subjects. Using dummy data.", error);
+            } catch (error: any) {
+                console.error('Could not fetch subjects:', error.message);
+                toast.error(`Failed to load subjects: ${error.message}`);
+                // Fallback to dummy data
                 setSubjects([{ id: 1, name: 'Chemistry' }, { id: 2, name: 'Physics' }]);
             }
         };
-        fetchSubjects();
+        fetchBatchesAndSubjects();
     }, []);
     
     const handleSessionStart = () => {
-        if (selectedSubject) {
+        if (selectedBatch && selectedSubject) {
             setIsSessionSet(true);
             toast.success('Attendance session started!');
         } else {
-            toast.error('Please select a subject to start the session.');
+            toast.error('Please select a batch and a subject to start the session.');
         }
     };
 
@@ -74,7 +100,11 @@ export default function AttendanceCheckinPage() {
         const toastId = toast.loading('Checking you in...');
 
         try {
-            const response = await api.markAttendance(studentId.trim(), parseInt(selectedSubject));
+            const response = await api.markAttendance(
+                studentId.trim(), 
+                parseInt(selectedSubject), 
+                parseInt(selectedBatch)
+            );
             toast.success('✅ Attendance marked successfully!', { id: toastId });
             
             // Add to recent check-ins
@@ -98,6 +128,7 @@ export default function AttendanceCheckinPage() {
     
     const resetSession = () => {
         setIsSessionSet(false);
+    setSelectedBatch('');
         setSelectedSubject('');
         setStudentId('');
         setRecentCheckIns([]);
@@ -125,15 +156,15 @@ export default function AttendanceCheckinPage() {
                             <Clock className="text-blue-600" size={24} />
                             <div>
                                 <div className="text-2xl font-bold text-gray-900">
-                                    {currentTime.toLocaleTimeString()}
+                                    {mounted ? currentTime?.toLocaleTimeString() : '--:--:--'}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    {currentTime.toLocaleDateString(undefined, { 
+                                    {mounted && currentTime ? currentTime.toLocaleDateString('en-US', { 
                                         weekday: 'long', 
-                                        year: 'numeric', 
+                                        day: 'numeric',
                                         month: 'long', 
-                                        day: 'numeric' 
-                                    })}
+                                        year: 'numeric'
+                                    }).replace(',', '') : '--'}
                                 </div>
                             </div>
                         </div>
@@ -157,6 +188,26 @@ export default function AttendanceCheckinPage() {
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-3">
+                                        Select Batch for Today's Session
+                                    </label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        {batches.map(batch => (
+                                            <button
+                                                key={batch.id}
+                                                onClick={() => setSelectedBatch(batch.id.toString())}
+                                                className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                                                    selectedBatch === batch.id.toString()
+                                                        ? 'border-green-500 bg-green-50 text-green-700'
+                                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                <Users className="mx-auto mb-2" size={24} />
+                                                <div className="font-semibold">Batch {batch.year || batch.id}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <label className="block text-sm font-medium text-gray-700 mb-3">
                                         Select Subject for Today's Session
                                     </label>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -179,7 +230,7 @@ export default function AttendanceCheckinPage() {
 
                                 <button
                                     onClick={handleSessionStart}
-                                    disabled={!selectedSubject}
+                                    disabled={!selectedBatch || !selectedSubject}
                                     className="w-full py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                                 >
                                     <LogIn size={20} />
@@ -202,9 +253,14 @@ export default function AttendanceCheckinPage() {
                                             <h3 className="font-semibold text-green-900">
                                                 Attendance Session Active
                                             </h3>
-                                            <p className="text-sm text-green-700">
-                                                Subject: {subjects.find(s => s.id === parseInt(selectedSubject))?.name}
-                                            </p>
+                                            <div className="text-sm text-green-700 space-y-1">
+                                                <p>
+                                                    Batch: {batches.find(b => b.id === parseInt(selectedBatch))?.year || selectedBatch}
+                                                </p>
+                                                <p>
+                                                    Subject: {subjects.find(s => s.id === parseInt(selectedSubject))?.name}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -279,6 +335,12 @@ export default function AttendanceCheckinPage() {
                                     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                                         <span className="text-sm text-blue-900">Students Checked In</span>
                                         <span className="text-xl font-bold text-blue-600">{recentCheckIns.length}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                        <span className="text-sm text-green-900">Batch</span>
+                                        <span className="text-sm font-semibold text-green-600">
+                                            {batches.find(b => b.id === parseInt(selectedBatch))?.year || selectedBatch}
+                                        </span>
                                     </div>
                                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                                         <span className="text-sm text-green-900">Subject</span>

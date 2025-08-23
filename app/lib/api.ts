@@ -15,6 +15,15 @@ async function handleResponse(response: Response) {
     return response.text();
 }
 
+// === PUBLIC ENDPOINTS ===
+export const getPublicBatches = () => 
+    fetch(`${API_BASE_URL}/api/attendance/public/batches`)
+        .then(handleResponse)
+        .catch(error => {
+            console.error('Error fetching batches:', error);
+            throw error;
+        });
+
 // === AUTH ===
 export const login = (username: string, password: string): Promise<{ token: string }> => 
     fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -93,16 +102,16 @@ export const sendMessage = (messageData: MessageData, token: string) =>
     }).then(handleResponse);
 
 // === PUBLIC ATTENDANCE ===
-export const markAttendance = (studentId: string, subjectId: number) =>
+export const markAttendance = (studentId: string, subjectId: number, batchId: number) =>
     fetch(`${API_BASE_URL}/api/attendance/mark`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId, subjectId }),
+        body: JSON.stringify({ studentId, subjectId, batchId }),
     }).then(handleResponse);
 
 // === ADMIN - ATTENDANCE REPORTS ===
-export const getAttendanceReport = (subjectId: number, date: string, token: string) => 
-    fetch(`${API_BASE_URL}/api/attendance/report?subjectId=${subjectId}&date=${date}`, {
+export const getAttendanceReport = (subjectId: number, batchId: number, date: string, token: string) => 
+    fetch(`${API_BASE_URL}/api/attendance/report?subjectId=${subjectId}&batchId=${batchId}&date=${date}`, {
         headers: { 'Authorization': `Bearer ${token}` }
     }).then(handleResponse);
 

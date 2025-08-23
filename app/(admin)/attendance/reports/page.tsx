@@ -29,27 +29,40 @@ export default function AttendanceReportPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { token } = useAuth();
 
+    const [batches, setBatches] = useState<any[]>([]);
+    const [selectedBatch, setSelectedBatch] = useState('');
+
     useEffect(() => {
-        const fetchSubjects = async () => {
+        const fetchData = async () => {
             if (!token) return;
             try {
-                setSubjects(await api.getSubjects(token));
+                const [subjectsData, batchesData] = await Promise.all([
+                    api.getSubjects(token),
+                    api.getBatches(token)
+                ]);
+                setSubjects(subjectsData);
+                setBatches(batchesData);
             } catch (error: any) {
-                toast.error(`Failed to load subjects: ${error.message}`);
+                toast.error(`Failed to load data: ${error.message}`);
             }
         };
-        fetchSubjects();
+        fetchData();
     }, [token]);
 
     const handleFetchReport = async () => {
-        if (!token || !selectedSubject || !selectedDate) {
-            toast.error('Please select a subject and a date.');
+        if (!token || !selectedSubject || !selectedDate || !selectedBatch) {
+            toast.error('Please select a batch, subject, and date.');
             return;
         }
         setIsLoading(true);
         setReportData(null);
         try {
-            const data = await api.getAttendanceReport(parseInt(selectedSubject), selectedDate, token);
+            const data = await api.getAttendanceReport(
+                parseInt(selectedSubject),
+                parseInt(selectedBatch),
+                selectedDate,
+                token
+            );
             setReportData(data);
         } catch (error: any) {
             toast.error(`Failed to fetch report: ${error.message}`);
@@ -99,6 +112,24 @@ export default function AttendanceReportPage() {
                     Report Filters
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Batch
+                        </label>
+                        <div className="relative">
+                            <Users className="absolute left-3 top-3 text-gray-400" size={20} />
+                            <select 
+                                value={selectedBatch} 
+                                onChange={e => setSelectedBatch(e.target.value)} 
+                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            >
+                                <option value="">Select Batch</option>
+                                {batches.map(b => (
+                                    <option key={b.id} value={b.id}>{b.year}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Subject
