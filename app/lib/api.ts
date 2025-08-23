@@ -5,8 +5,16 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 // Helper function to handle API responses
 async function handleResponse(response: Response) {
     if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: 'An unknown error occurred' }));
-        throw new Error(error.error || error.message || 'API request failed');
+        const contentType = response.headers.get("content-type");
+        let errorMessage = 'An unknown error occurred';
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+            const error = await response.json().catch(() => ({ message: errorMessage }));
+            errorMessage = error.error || error.message || errorMessage;
+        } else {
+            // Try to get plain text error
+            errorMessage = await response.text();
+        }
+        throw new Error(errorMessage);
     }
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.indexOf("application/json") !== -1) {
